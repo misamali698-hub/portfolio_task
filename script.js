@@ -1,0 +1,23 @@
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const menu=$('#menu'),burger=$('.burger'),nav=$('.nav');
+const setMenu=o=>{menu.classList.toggle('open',o);burger.setAttribute('aria-expanded',o);burger.setAttribute('aria-label',o?'Close menu':'Open menu')};
+burger.onclick=()=>setMenu(!menu.classList.contains('open'));
+$$('#menu a').forEach(a=>a.onclick=()=>setMenu(false));
+addEventListener('keydown',e=>e.key==='Escape'&&setMenu(false));
+const onScroll=()=>nav.classList.toggle('sc',scrollY>8);onScroll();addEventListener('scroll',onScroll,{passive:true});
+$('#yr').textContent=new Date().getFullYear();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+$$('.rv').forEach(el=>io.observe(el));
+const links=$$('#menu a'),so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const id='#'+e.target.id;links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')===id))}}),{rootMargin:'-45% 0px -50% 0px'});
+$$('main section[id]').forEach(s=>so.observe(s));
+const f=$('#form'),note=f.querySelector('.note'),base=note.textContent;
+const rules={name:v=>v.trim().length>=2||'Please enter your name.',email:v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())||'Please enter a valid email address.',message:v=>v.trim().length>=10||'Please write at least 10 characters.'};
+const check=el=>{const r=rules[el.name](el.value),bad=r!==true;el.classList.toggle('bad',bad);el.setAttribute('aria-invalid',bad);el.nextElementSibling.textContent=bad?r:'';return !bad};
+const fields=$$('#form input,#form textarea');
+fields.forEach(el=>{el.addEventListener('blur',()=>check(el));el.addEventListener('input',()=>el.classList.contains('bad')&&check(el))});
+f.onsubmit=e=>{e.preventDefault();
+if(fields.map(check).includes(false)){f.querySelector('.bad').focus();return}
+const d=Object.fromEntries(new FormData(f));
+location.href='mailto:misamali698@gmail.com?subject='+encodeURIComponent('Portfolio message from '+d.name)+'&body='+encodeURIComponent(d.message+'\n\nFrom: '+d.name+' ('+d.email+')');
+note.textContent='Your email app should now open with the message ready. Nothing was sent from this page.';note.classList.add('ok');
+setTimeout(()=>{note.textContent=base;note.classList.remove('ok')},8000)};
